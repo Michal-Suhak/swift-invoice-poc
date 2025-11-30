@@ -12,11 +12,12 @@ import { FileText, Plus, RefreshCw } from "lucide-react";
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 interface Invoice {
-  id: string;
+  id: number;
   customer: string;
-  amount: number;
+  amount: string;  // API returns amount as string
   status: string;
   created_at: string;
+  updated_at: string;
 }
 
 const Index = () => {
@@ -32,7 +33,7 @@ const Index = () => {
   const fetchInvoices = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/invoices`);
+      const response = await fetch(`${API_BASE_URL}/api/v1/invoices/`);
       if (!response.ok) throw new Error("Failed to fetch invoices");
       const data = await response.json();
       setInvoices(data);
@@ -64,7 +65,7 @@ const Index = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/invoices`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/invoices/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -229,7 +230,7 @@ const Index = () => {
                         <TableRow key={invoice.id} className="hover:bg-muted/50 transition-colors">
                           <TableCell className="font-medium">{invoice.customer}</TableCell>
                           <TableCell className="font-semibold text-primary">
-                            ${invoice.amount.toFixed(2)}
+                            ${parseFloat(invoice.amount).toFixed(2)}
                           </TableCell>
                           <TableCell>{getStatusBadge(invoice.status)}</TableCell>
                           <TableCell className="text-muted-foreground">

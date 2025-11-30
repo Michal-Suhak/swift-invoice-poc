@@ -41,6 +41,26 @@ services:
       - invoice-network
     restart: unless-stopped
 
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: swift-invoice-frontend
+    environment:
+      VITE_API_URL: http://localhost:8000
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./index.html:/app/index.html
+      - ./vite.config.ts:/app/vite.config.ts
+    depends_on:
+      - backend
+    networks:
+      - invoice-network
+    restart: unless-stopped
+
 volumes:
   postgres_data:
 
