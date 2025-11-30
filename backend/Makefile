@@ -1,22 +1,22 @@
 install:
-	uv pip install -e .
+	uv pip install --system -e .
 
 install-dev:
-	uv pip install -e ".[dev]"
+	uv pip install --system -e ".[dev]"
 
 run:
-	uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+	uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 test:
-	uv run pytest
+	pytest
 
 lint:
-	uv run ruff check app tests
-	uv run mypy app
+	ruff check app tests
+	mypy app
 
 format:
-	uv run black app tests
-	uv run ruff check --fix app tests
+	black app tests
+	ruff check --fix app tests
 
 check: lint test
 
@@ -27,14 +27,28 @@ db-up:
 	@echo "Waiting for PostgreSQL to be ready..."
 	@sleep 3
 
+db-down:
+	cd .. && docker-compose down
+
 db-migrate:
-	uv run alembic revision --autogenerate -m "$(msg)"
+	alembic revision --autogenerate -m "$(msg)"
 
 db-upgrade:
-	uv run alembic upgrade head
+	alembic upgrade head
 
 db-downgrade:
-	uv run alembic downgrade -1
+	alembic downgrade -1
 
 db-revision:
-	uv run alembic revision -m "$(msg)"
+	alembic revision -m "$(msg)"
+
+docker-build:
+	cd .. && docker-compose build
+docker-up:
+	cd .. && docker-compose up -d
+
+docker-down:
+	cd .. && docker-compose down
+
+docker-restart:
+	cd .. && docker-compose restart backend

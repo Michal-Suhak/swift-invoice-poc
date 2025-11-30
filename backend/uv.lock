@@ -437,7 +437,7 @@ wheels = [
 [[package]]
 name = "invoice-service-backend"
 version = "1.0.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "alembic" },
     { name = "asyncpg" },

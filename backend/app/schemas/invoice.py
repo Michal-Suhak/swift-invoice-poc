@@ -10,7 +10,9 @@ class InvoiceCreate(BaseModel):
     customer: str = Field(..., min_length=1, max_length=255, description="Customer name")
     amount: Decimal = Field(..., gt=0, description="Invoice amount")
     status: str = Field(
-        default="pending", pattern="^(pending|paid|cancelled|overdue)$", description="Invoice status"
+        default="pending",
+        pattern="^(pending|paid|cancelled|overdue)$",
+        description="Invoice status",
     )
 
 

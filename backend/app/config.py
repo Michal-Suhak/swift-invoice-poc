@@ -1,21 +1,31 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    APP_VERSION: str = "1.0.0"
     DEBUG: bool = True
-
     HOST: str = "0.0.0.0"
     PORT: int = 8000
 
-    # Database
-    POSTGRES_USER: str = "invoice_user"
-    POSTGRES_PASSWORD: str = "invoice_password"
-    POSTGRES_DB: str = "invoice_db"
+    # Database - Required fields without defaults for security
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
     POSTGRES_HOST: str = "localhost"
-    POSTGRES_PORT: int = 5432
+    POSTGRES_PORT: int = 5433
+
+    CORS_ORIGINS: list[str] = [
+        "http://localhost:8080",
+        "http://localhost:5173",
+        "http://localhost:3000",
+    ]
+
+    class Config:
+        # Use absolute path to .env file in project root
+        env_file = str(Path(__file__).resolve().parent.parent.parent / ".env")
+        case_sensitive = True
 
     @property
     def database_url(self) -> str:
@@ -23,19 +33,12 @@ class Settings(BaseSettings):
 
     @property
     def sync_database_url(self) -> str:
-        """Sync database URL for Alembic migrations"""
         return f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
-
-    CORS_ORIGINS: list[str] = ["http://localhost:8080", "http://localhost:5173", "http://localhost:3000"]
-
-    class Config:
-        env_file = "../.env"  # Use root .env file
-        case_sensitive = True
 
 
 @lru_cache
 def get_settings() -> Settings:
-    return Settings()
+    return Settings()  # type: ignore[call-arg]
 
 
 settings = get_settings()

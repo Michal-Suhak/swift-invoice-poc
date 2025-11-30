@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=68.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "invoice-service-backend"
 version = "1.0.0"
@@ -16,6 +20,11 @@ dependencies = [
     "python-dotenv>=1.0.1",
     "python-multipart>=0.0.18",
 ]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+exclude = ["alembic*", "tests*", "logs*"]
 
 [project.optional-dependencies]
 dev = [
@@ -54,3 +63,6 @@ python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
+explicit_package_bases = true
+namespace_packages = true
+mypy_path = "$MYPY_CONFIG_FILE_DIR"
