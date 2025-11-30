@@ -8,7 +8,10 @@ run:
 	uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
 test:
-	pytest
+	pytest -v
+
+test-cov:
+	pytest -v --cov=app --cov-report=html --cov-report=term
 
 lint:
 	ruff check app tests

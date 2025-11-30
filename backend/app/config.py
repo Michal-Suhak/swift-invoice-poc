@@ -23,9 +23,9 @@ class Settings(BaseSettings):
     ]
 
     class Config:
-        # Use absolute path to .env file in project root
         env_file = str(Path(__file__).resolve().parent.parent.parent / ".env")
         case_sensitive = True
+        extra = "ignore"
 
     @property
     def database_url(self) -> str:
