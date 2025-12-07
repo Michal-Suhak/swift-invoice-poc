@@ -1,73 +1,184 @@
-# Welcome to your Lovable project
+# Swift Invoice POC
 
-## Project info
+A modern full-stack invoice management system built with React, FastAPI, and PostgreSQL.
 
-**URL**: https://lovable.dev/projects/11e04c1b-2d39-4c40-b0eb-9f2cd08344b4
+### Technology Stack
 
-## How can I edit this code?
+**Frontend:**
+- React 18 with TypeScript
+- Vite (build tool)
+- shadcn/ui components
+- TailwindCSS
+- React Router
+- TanStack Query (React Query)
 
-There are several ways of editing your application.
+**Backend:**
+- FastAPI (Python 3.11+)
+- SQLAlchemy 2.0 (async)
+- Alembic (database migrations)
+- Pydantic v2 (validation)
+- PostgreSQL (database)
 
-**Use Lovable**
+**Infrastructure:**
+- Docker & Docker Compose
+- Nginx (production)
+- UV (Python package manager)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/11e04c1b-2d39-4c40-b0eb-9f2cd08344b4) and start prompting.
+## Quick Start
 
-Changes made via Lovable will be committed automatically to this repo.
+### 1. Clone the Repository
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```bash
+git clone <repository-url>
+cd swift-invoice-poc
 ```
 
-**Edit a file directly in GitHub**
+### 2. Configure Environment Variables
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Set up the environment variables in the `.env` file. Default values are listed in the env.example
 
-**Use GitHub Codespaces**
+```bash
+# .env file (already configured with defaults)
+POSTGRES_USER=invoice_user
+POSTGRES_PASSWORD=invoice_password
+POSTGRES_DB=invoice_db
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5433
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+DEBUG=False
+HOST=0.0.0.0
+PORT=8000
 
-## What technologies are used for this project?
+VITE_API_URL=http://localhost:8000
+```
 
-This project is built with:
+### 3. Start the Application
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```bash
+docker compose up -d
+```
 
-## How can I deploy this project?
+This command will:
+- Pull required Docker images (first time only)
+- Build the frontend and backend containers
+- Start PostgreSQL, backend, and frontend services
+- Run database migrations automatically
+- Start all services in detached mode
 
-Simply open [Lovable](https://lovable.dev/projects/11e04c1b-2d39-4c40-b0eb-9f2cd08344b4) and click on Share -> Publish.
+### 4. Verify the Setup
 
-## Can I connect a custom domain to my Lovable project?
+Wait 10-15 seconds for services to initialize, then verify:
 
-Yes, you can!
+```bash
+# Check all containers are running
+docker compose ps
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+# Should show:
+# - swift-invoice-postgres (healthy)
+# - swift-invoice-backend  (running)
+# - swift-invoice-frontend (running)
+```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Test the backend health:
+```bash
+curl http://localhost:8000/api/v1/health
+# Expected: {"status":"ok"}
+```
+
+### 5. Access the Application
+
+- **Frontend:** http://localhost:8080
+- **Backend API Docs:** http://localhost:8000/docs
+- **Alternative API Docs:** http://localhost:8000/redoc
+
+### Stop the Application
+
+```bash
+docker compose down
+```
+
+### Restart Services
+
+```bash
+# Restart all services
+docker compose restart
+
+# Restart specific service
+docker compose restart backend
+```
+
+### Access the Database
+
+```bash
+# Connect to PostgreSQL
+docker compose exec postgres psql -U invoice_user -d invoice_db
+
+# Example queries:
+# \dt                    -- List tables
+# SELECT * FROM invoices; -- View invoices
+# \q                     -- Quit
+```
+
+### Run Database Migrations
+
+Migrations run automatically on container startup. To run manually:
+
+```bash
+docker compose exec backend alembic upgrade head
+```
+
+To create a new migration:
+
+```bash
+docker compose exec backend alembic revision --autogenerate -m "description"
+```
+
+## Testing
+
+### Backend Tests
+
+The backend includes a comprehensive test suite with pytest.
+
+```bash
+# Run all tests
+docker compose exec backend pytest
+
+# Run with coverage report
+docker compose exec backend pytest --cov=app --cov-report=html
+
+# Run specific test file
+docker compose exec backend pytest tests/test_invoices.py
+
+# View coverage report (after running with --cov-report=html)
+open backend/htmlcov/index.html
+```
+
+### Frontend Tests
+
+```bash
+# Run frontend tests (if implemented)
+docker compose exec frontend npm test
+```
+
+## Production Deployment
+
+For production deployment instructions, see:
+- **AWS Deployment:** `docs/AWS_DEPLOYMENT.md`
+- **Docker Production:** Use `Dockerfile` (not `Dockerfile.dev`)
+- **Environment:** Set `DEBUG=False` and use strong passwords
+
+## Code Quality
+
+The project uses:
+- **Backend:** Black, Ruff, MyPy
+- **Frontend:** ESLint, TypeScript
+
+```bash
+# Backend linting
+docker compose exec backend ruff check app tests
+docker compose exec backend black --check app tests
+docker compose exec backend mypy app
+
+# Frontend linting
+docker compose exec frontend npm run lint
+```
